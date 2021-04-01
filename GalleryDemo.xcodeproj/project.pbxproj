@@ -153,19 +153,13 @@
 		F914C21F260B8EF900AD4AC8 /* GalleryDemo */ = {
 			isa = PBXGroup;
 			children = (
-				F914C220260B8EF900AD4AC8 /* AppDelegate.swift */,
-				F914C224260B8EF900AD4AC8 /* ViewController.swift */,
-				F95F4A1D260CDE7D00A76980 /* APIManager.swift */,
-				F9EC8C9826123FE1007C3962 /* RequestQueueManager.swift */,
-				F95F4A3F26103A4A00A76980 /* Entities */,
-				F95F4A3A2610385200A76980 /* MainViewModel.swift */,
-				F95F4A35260E4A1400A76980 /* MainViewController.swift */,
-				F914C226260B8EF900AD4AC8 /* Main.storyboard */,
-				F95F4A5426106B6900A76980 /* PhotoItem.swift */,
-				F95F4A5526106B6900A76980 /* PhotoItem.xib */,
-				F914C229260B8EFA00AD4AC8 /* Assets.xcassets */,
-				F914C22B260B8EFA00AD4AC8 /* LaunchScreen.storyboard */,
-				F914C22E260B8EFA00AD4AC8 /* Info.plist */,
+				F9EC8CC626161F0B007C3962 /* Controller */,
+				F9EC8CBE26161E39007C3962 /* Manager */,
+				F95F4A3F26103A4A00A76980 /* Model */,
+				F9EC8CCA26161F1B007C3962 /* ViewModel */,
+				F9EC8CCE26161F27007C3962 /* Nibs */,
+				F9EC8CC226161E96007C3962 /* View */,
+				F9EC8CCF26161F3E007C3962 /* Resources */,
 			);
 			path = GalleryDemo;
 			sourceTree = "<group>";
@@ -188,13 +182,67 @@
 			path = GalleryDemoUITests;
 			sourceTree = "<group>";
 		};
-		F95F4A3F26103A4A00A76980 /* Entities */ = {
+		F95F4A3F26103A4A00A76980 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				F95F4A30260E455B00A76980 /* Photo.swift */,
 				F95F4A4F2610678600A76980 /* Subject.swift */,
 			);
-			path = Entities;
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F9EC8CBE26161E39007C3962 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				F95F4A1D260CDE7D00A76980 /* APIManager.swift */,
+				F9EC8C9826123FE1007C3962 /* RequestQueueManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
+		F9EC8CC226161E96007C3962 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F95F4A5426106B6900A76980 /* PhotoItem.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F9EC8CC626161F0B007C3962 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				F914C220260B8EF900AD4AC8 /* AppDelegate.swift */,
+				F914C224260B8EF900AD4AC8 /* ViewController.swift */,
+				F95F4A35260E4A1400A76980 /* MainViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		F9EC8CCA26161F1B007C3962 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F95F4A3A2610385200A76980 /* MainViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F9EC8CCE26161F27007C3962 /* Nibs */ = {
+			isa = PBXGroup;
+			children = (
+				F914C22B260B8EFA00AD4AC8 /* LaunchScreen.storyboard */,
+				F914C226260B8EF900AD4AC8 /* Main.storyboard */,
+				F95F4A5526106B6900A76980 /* PhotoItem.xib */,
+			);
+			path = Nibs;
+			sourceTree = "<group>";
+		};
+		F9EC8CCF26161F3E007C3962 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F914C229260B8EFA00AD4AC8 /* Assets.xcassets */,
+				F914C22E260B8EFA00AD4AC8 /* Info.plist */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
