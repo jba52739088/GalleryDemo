@@ -2,49 +2,37 @@
 //  APIManager.swift
 //  GalleryDemo
 //
-//  Created by 黃恩祐 on 2021/3/25.
+//  Created by 黃恩祐 on 2021/4/5.
 //
 
+import Foundation
 import Moya
 
-enum APIManager {
-    case getPhotos
+class APIManager {
+    
+    static let shared = APIManager()
+    let provider = MoyaProvider<APIService>()
+    
+    func getPhotoList(_ completion: @escaping (Subject<[PhotoData]>?) -> Void){
+        provider.request(.getPhotos) { [weak self] result in
+            guard self != nil else { return }
+            switch result {
+            case .success(let response):
+                do {
+                    let data = response.data
+                    let photoList = try JSONDecoder().decode([Photo].self, from: data)
+                    let dataList: [PhotoData] = photoList.map { data in
+                        return PhotoData(data)
+                    }
+                    completion(Subject(dataList))
+                    RequestQueueManager.shared.preFetchPhotos(dataList: dataList)
+                } catch(let error) {
+                    print(error)
+                }
+            case .failure:
+                completion(nil)
+            }
+        }
+        
+    }
 }
-
-extension APIManager: TargetType {
-    var baseURL: URL {
-        return URL(string: "https://jsonplaceholder.typicode.com") ?? URL(string: "about:blank")!
-    }
-    
-    var path: String {
-        switch self {
-            case .getPhotos:
-                return "/photos"
-            }
-    }
-    
-    var method: Method {
-        switch self {
-            case .getPhotos:
-                return .get
-            }
-    }
-    
-    var sampleData: Data {
-        return Data()
-    }
-    
-    var task: Task {
-        return .requestPlain
-    }
-    
-    var headers: [String : String]? {
-        switch self {
-            case .getPhotos:
-                return nil
-            }
-    }
-    
-    
-}
-

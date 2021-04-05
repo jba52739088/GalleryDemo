@@ -36,6 +36,7 @@ class RequestQueueManager {
         self.session = self.customSession
     }
     
+    /// 取圖片
     func fetchPhotoImage(data: PhotoData, _ completionHandler: @escaping (PhotoData) -> ()) {
         self.mainQueueRunning = true
         self.requestImage(data) { photoData in
@@ -45,6 +46,7 @@ class RequestQueueManager {
         
     }
     
+    /// 預取使用者還沒滑到時的圖片
     func preFetchPhotos(dataList: [PhotoData]) {
         self.dataList = dataList
     }
@@ -63,6 +65,7 @@ extension RequestQueueManager {
         }
     }
     
+    /// 預取使用者還沒滑到時的圖片，當didPreFetchCount等於資料數後停止
     private func startPreFetchPhotos(_ data: PhotoData) {
         if mainQueueRunning || (self.delayTimer?.isValid ?? false) || (self.didPreFetchCount >= self.dataList.count) {
             self.delayTimer?.invalidate()
@@ -75,13 +78,18 @@ extension RequestQueueManager {
             self.startPreFetchPhotos(self.willFetchData)
             return
         }
-        //        print("DispatchQueue: \(data.photo.id)")
         self.requestImage(data) { _ in
             self.didPreFetchCount += 1
             self.startPreFetchPhotos(self.willFetchData)
         }
     }
     
+    
+    /// 從url取得圖片
+    /// - Parameters:
+    ///   - data: PhotoData
+    ///   - withEtag: 是否檢查Etag, 若第一次返回304但cache找不到圖片，則第二次不檢查
+    ///   - completionHandler: 返回PhotoData之closure
     private func requestImage(_ data:  PhotoData, withEtag: Bool = true, _ completionHandler: @escaping (PhotoData) -> ()) {
         // Etag
         let headers: HTTPHeaders =
@@ -127,19 +135,20 @@ extension RequestQueueManager {
         
     }
     
+    /// 因圖片URL SSL過期，故自定義Session以取得圖片
     private var customSession: Session {
         let manager = ServerTrustManager(evaluators: ["via.placeholder.com": DisabledTrustEvaluator()])
         let configuration = URLSessionConfiguration.af.default
         return Session(configuration: configuration, serverTrustManager: manager)
     }
     
-    // Except in memory Etag
+    /// 將Etag存至UserDefault
     private func saveEtagUserDefault(etagValue: String, key: String) -> Void {
         UserDefaults.standard.set(etagValue, forKey:key)
         UserDefaults.standard.synchronize()
     }
     
-    // Recovery from the memory Etag
+    /// 至UserDefault取出Etag
     private func loadEtagUserDefault(keyValue: String) -> String {
         return UserDefaults.standard.object(forKey: keyValue) as? String ?? "0"
     }

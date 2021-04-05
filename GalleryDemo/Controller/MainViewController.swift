@@ -33,6 +33,7 @@ extension MainViewController {
         self.collectionView.register(UINib(nibName: "PhotoItem", bundle: nil), forCellWithReuseIdentifier: "imgItem")
     }
     
+    // 訂閱viewModel
     private func subscriptVM() {
         self.viewModel = MainViewModel()
         
@@ -48,6 +49,7 @@ extension MainViewController {
         self.viewModel?.getPhotoList()
     }
     
+    // api取得圖片資料
     private func onGetImageData(_ data: PhotoData) {
         DispatchQueue.main.async {
             if let cell = self.collectionView.visibleCells.first(where: { ($0 as? PhotoItem)?.photoData?.photo.id == data.photo.id }) {
@@ -60,6 +62,7 @@ extension MainViewController {
     }
 }
 
+//MARK: UICollectionViewDelegate
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -88,6 +91,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
 }
 
+//MARK: PhotoItemDelegate
 extension MainViewController: PhotoItemDelegate {
     func requestImage(_ data: PhotoData) {
         self.viewModel?.getPhotoImage(data: data)

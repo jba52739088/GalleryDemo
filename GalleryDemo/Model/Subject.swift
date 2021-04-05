@@ -8,7 +8,9 @@
 import Foundation
 
 class Subject<T> {
+    
     typealias Listener = (T?) -> Void
+    
     var listener: Listener?
     
     func bind(_ listener: Listener?) {

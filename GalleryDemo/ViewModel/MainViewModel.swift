@@ -8,7 +8,6 @@
 import Foundation
 import Alamofire
 import AlamofireImage
-import Moya
 
 protocol MainViewModelInterface {
     
@@ -20,38 +19,22 @@ protocol MainViewModelInterface {
 }
 class MainViewModel{
     
-    let provider = MoyaProvider<APIManager>()
+    let apiManager: APIManager!
     let photoListSubject = Subject<[PhotoData]>()
     let getImageSubject = Subject<PhotoData>()
     
-    init() {
-        
+    init(apiManager: APIManager = APIManager.shared) {
+        self.apiManager = apiManager
     }
 }
 extension MainViewModel: MainViewModelInterface{
     
     func getPhotoList() {
-        provider.request(.getPhotos) { [weak self] result in
-            guard self != nil else { return }
-            switch result {
-            case .success(let response):
-                do {
-                    let data = response.data
-                    let photoList = try JSONDecoder().decode([Photo].self, from: data)
-                    let dataList: [PhotoData] = photoList.map { data in
-                        return PhotoData(data)
-                    }
-                    self?.photoListSubject.value = dataList
-                    RequestQueueManager.shared.preFetchPhotos(dataList: dataList)
-                } catch(let error) {
-                    print(".....")
-                    print(error)
-                }
-            case .failure:
-                print("failure")
+        self.apiManager.getPhotoList { [weak self] result in
+            if let subject = result {
+                self?.photoListSubject.value = subject.value
             }
         }
-        
     }
     
     func getPhotoImage(data: PhotoData) {
