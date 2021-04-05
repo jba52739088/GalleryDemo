@@ -39,7 +39,10 @@ extension APIManager: TargetType {
     }
     
     var headers: [String : String]? {
-        return nil
+        switch self {
+            case .getPhotos:
+                return nil
+            }
     }
     
     

@@ -49,15 +49,12 @@ extension MainViewController {
     }
     
     private func onGetImageData(_ data: PhotoData) {
-        if let cell = self.collectionView.cellForItem(at: IndexPath(item: data.photo.id - 1, section: 0)) as? PhotoItem,
-           cell.photoData?.photo.id == data.photo.id {
-            cell.updateItem(data)
-        }else {
-            self.collectionView.visibleCells.forEach { _item in
-                if let correctItem = _item as? PhotoItem,
-                   correctItem.photoData?.photo.id == data.photo.id {
-                    correctItem.updateItem(data)
-                }
+        DispatchQueue.main.async {
+            if let cell = self.collectionView.visibleCells.first(where: { ($0 as? PhotoItem)?.photoData?.photo.id == data.photo.id }) {
+                (cell as? PhotoItem)?.updateItem(data)
+            }else if let cell = self.collectionView.cellForItem(at: IndexPath(item: data.photo.id - 1, section: 0)) as? PhotoItem,
+               cell.photoData?.photo.id == data.photo.id {
+                cell.updateItem(data)
             }
         }
     }
@@ -89,15 +86,6 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
-//                print("cancel fetch item: \(indexPath.item)")
-//                self.viewModel?.cancelFetchImage(data: self.photoList[indexPath.item])
-//            }
-//        }
-//    }
 }
 
 extension MainViewController: PhotoItemDelegate {

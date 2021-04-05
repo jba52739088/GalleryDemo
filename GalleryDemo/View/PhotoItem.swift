@@ -36,7 +36,7 @@ class PhotoItem: UICollectionViewCell {
     func updateItem(_ data: PhotoData) {
         if self.photoData?.photo.id == data.photo.id {
             self.photoData = data
-            self.initView(data)
+            self.updateView(data)
         }else {
             print("💔💔💔💔💔💔💔💔💔💔")
         }
@@ -48,33 +48,18 @@ extension PhotoItem {
     private func initView(_ data: PhotoData) {
         self.lbImgID.text = "\(data.photo.id)"
         self.lbImgTitle.text = data.photo.title
-        if data.cachedImage == nil {
-            self.imgView.image = nil
-            self.delegate?.requestImage(data)
+        if let tempImage = data.tempImage {
+            self.imgView.image = tempImage
         }else {
             self.imgView.image = data.cachedImage
+            self.delegate?.requestImage(data)
         }
     }
     
-    private func getImage(_ data: PhotoData) {
-        if let image = data.cachedImage {
-            print("get img from cachedImage, id: \(data.photo.id)")
-            self.imgView.image = image
-        }else {
-            self.imgView.image = nil
-            AF.request(data.photo.thumbnailUrl).responseImage { response in
-                switch response.result {
-                case .success(let image):
-                    if response.request?.url?.absoluteString == self.photoData?.photo.thumbnailUrl {
-                        self.imgView.image = image
-                        self.photoData?.cacheImage(image: image)
-                    }else if let photoData = self.photoData{
-                        self.getImage(photoData)
-                    }
-                case .failure(let error):
-                    print(error)
-                }
-            }
-        }
+    private func updateView(_ data: PhotoData) {
+        self.lbImgID.text = "\(data.photo.id)"
+        self.lbImgTitle.text = data.photo.title
+        self.imgView.image = data.cachedImage
+        self.imgView.setNeedsDisplay()
     }
 }

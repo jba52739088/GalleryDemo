@@ -17,7 +17,6 @@ protocol MainViewModelInterface {
     
     func getPhotoList()
     func getPhotoImage(data: PhotoData)
-    func cancelFetchImage(data: PhotoData)
 }
 class MainViewModel{
     
@@ -61,18 +60,6 @@ extension MainViewModel: MainViewModelInterface{
         }else {
             RequestQueueManager.shared.fetchPhotoImage(data: data) { photoData in
                 self.getImageSubject.value = data
-            }
-        }
-    }
-    
-    func cancelFetchImage(data: PhotoData) {
-        AF.session.getTasksWithCompletionHandler { (dataTasks, _, downloadTasks) in
-            dataTasks.forEach { dataTask in
-                if dataTask.originalRequest?.url?.absoluteString == data.photo.thumbnailUrl {
-                    print("💟💟💟💟💟💟💟💟💟💟💟💟💟")
-                    dataTask.cancel()
-                    
-                }
             }
         }
     }

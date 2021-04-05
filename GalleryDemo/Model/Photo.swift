@@ -14,6 +14,16 @@ struct PhotoData {
     let photo: Photo
     let imageCache = AutoPurgingImageCache()
     
+    // NSCache圖片
+    var tempImage: UIImage? {
+        if  let url = NSURL(string: photo.thumbnailUrl),
+            let tempImage = RequestQueueManager.shared.imageCache.object(forKey: url) {
+            return tempImage
+        }
+        return nil
+    }
+    
+    // AlamofireImage ImageCacheå圖片
     var cachedImage: UIImage? {
         get {
             return self.getCachedImage()

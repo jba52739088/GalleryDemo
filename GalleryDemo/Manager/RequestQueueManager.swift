@@ -30,6 +30,8 @@ class RequestQueueManager {
         }
     }
     
+    private(set) var imageCache = NSCache<NSURL, UIImage>()
+    
     init() {
         self.session = self.customSession
     }
@@ -73,27 +75,56 @@ extension RequestQueueManager {
             self.startPreFetchPhotos(self.willFetchData)
             return
         }
-        print("DispatchQueue: \(data.photo.id)")
+        //        print("DispatchQueue: \(data.photo.id)")
         self.requestImage(data) { _ in
             self.didPreFetchCount += 1
             self.startPreFetchPhotos(self.willFetchData)
         }
     }
     
-    private func requestImage(_ data: PhotoData, _ completionHandler: @escaping (PhotoData) -> ()) {
+    private func requestImage(_ data:  PhotoData, withEtag: Bool = true, _ completionHandler: @escaping (PhotoData) -> ()) {
+        // Etag
+        let headers: HTTPHeaders =
+            withEtag
+            ? ["if-None-Match":  self.loadEtagUserDefault(keyValue: "\(data.photo.id)")]
+            : [:]
         
-        session?.request(data.photo.thumbnailUrl).responseImage { response in
+        session?.request(data.photo.thumbnailUrl, headers: headers).responseImage { response in
             switch response.result {
-            case .success ( let image) :
+            case .success (let image):
+                if let etag =  response.response?.allHeaderFields["Etag"] as? String {
+                    self.saveEtagUserDefault(etagValue: etag, key: "\(data.photo.id)")
+                }
+                if let url = NSURL(string: response.request?.url?.absoluteString ?? "") {
+                    self.imageCache.setObject(image, forKey: url)
+                }
                 if response.request?.url?.absoluteString == data.photo.thumbnailUrl {
                     data.cacheImage(image: image)
                     completionHandler(data)
                 }
+                return
             case .failure(let error):
-                print(error)
+                guard let statusCode = response.response?.statusCode else {
+                    print(error)
+                    return
+                }
+                if statusCode == 304 {
+                    if data.cachedImage != nil {
+                        completionHandler(data)
+                    }else {
+                        self.requestImage(data, withEtag: false) { (newData) in
+                            completionHandler(newData)
+                        }
+                    }
+                    
+                    return
+                }else {
+                    print(error)
+                }
                 
             }
         }
+        
     }
     
     private var customSession: Session {
@@ -101,7 +132,18 @@ extension RequestQueueManager {
         let configuration = URLSessionConfiguration.af.default
         return Session(configuration: configuration, serverTrustManager: manager)
     }
-
+    
+    // Except in memory Etag
+    private func saveEtagUserDefault(etagValue: String, key: String) -> Void {
+        UserDefaults.standard.set(etagValue, forKey:key)
+        UserDefaults.standard.synchronize()
+    }
+    
+    // Recovery from the memory Etag
+    private func loadEtagUserDefault(keyValue: String) -> String {
+        return UserDefaults.standard.object(forKey: keyValue) as? String ?? "0"
+    }
+    
 }
 
 
